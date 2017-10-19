@@ -1,0 +1,148 @@
+<div class="container not-print" *ngIf="infoCargada !== -1 && error != 3" >
+  <form (ngSubmit)="consultarPago($event)" #forma="ngForm">
+    <label class="custom-label-title custom-label-helper">Cédula</label>
+    <input autocomplete="off" required [disabled]="infoCargada === 2 && error === 0 || infoCargada === 1 && error === 1" [(ngModel)]="consulta.cedula"
+      name="cedula" pattern="^[0-9]+$" type="text" minlength="5" #cedula="ngModel" class="form-control" placeholder="Digite el número de cédula"
+    />
+    <label class="custom-helper-label" style="color:red" *ngIf="cedula.errors?.minlength">El número de cédula indicado, no cumple con los requisitos mínimos.</label>
+    <label class="custom-helper-label">Digite la cédula sin guiones ni espacios, pero con todos los ceros, ejemplo: 017770777, 3101010111</label>
+    <label class="custom-label-title custom-label-helper">Rango de fechas</label>
+    <div class="row">
+      <div class="col-md-6">
+        <my-date-picker required [disabled]="infoCargada === 2 && error === 0 || infoCargada === 1 && error === 1" [(ngModel)]="consulta.fecInicio"
+          name="fecInicio" [options]="datePickerOptions" placeholder="Fecha inicial" #fecInicio="ngModel"></my-date-picker>
+      </div>
+      <div class="col-md-6">
+        <my-date-picker required [disabled]="infoCargada === 2 && error === 0 || infoCargada === 1 && error === 1" [(ngModel)]="consulta.fecFin"
+          name="fecFin" [options]="datePickerOptions" placeholder="Fecha final" #fecFin="ngModel"></my-date-picker>
+      </div>
+      <div class="reCaptchaContainer" *ngIf="infoCargada === 0">
+        <div class="col-md-3 center">
+          <re-captcha site_key="6LezCCYTAAAAAOWGz4vIUAdxDtmkCaMQkFTP1eyY" class="reCaptcha" (captchaResponse)="handleCorrectCaptcha($event)"></re-captcha>
+        </div>
+        <div class="col-md-4 center">
+          <button type="submit" class="btn btn-primary primaryButton custom-button" [disabled]="fecInicio.errors?.required || fecFin.errors?.required || cedula.errors?.required || cedula.errors?.minlength || cedula.errors?.pattern || !captchaResponse">
+                <i class="fa fa-search"></i>
+                Consultar
+            </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="sk-circle not-print" *ngIf="infoCargada === 1 && error === 0 || infoCargada === -1">
+  <div class="sk-circle1 sk-child"></div>
+  <div class="sk-circle2 sk-child"></div>
+  <div class="sk-circle3 sk-child"></div>
+  <div class="sk-circle4 sk-child"></div>
+  <div class="sk-circle5 sk-child"></div>
+  <div class="sk-circle6 sk-child"></div>
+  <div class="sk-circle7 sk-child"></div>
+  <div class="sk-circle8 sk-child"></div>
+  <div class="sk-circle9 sk-child"></div>
+  <div class="sk-circle10 sk-child"></div>
+  <div class="sk-circle11 sk-child"></div>
+  <div class="sk-circle12 sk-child"></div>
+</div>
+<div class="container table-container col-md-12" *ngIf="infoCargada === 2 && error === 0">
+  <hr/>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+        <h1 style="text-align: center" class="print-area">Municipalidad de Pérez Zeledón</h1>
+        <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+      </div>
+      <h1 style="text-align: center" class="print-area">Reporte de pagos</h1>
+      <h2 style="text-align:center">{{nombreContribuyente}}</h2>
+    </div>
+    <div class="col-md-12">
+      <h3 style="text-align:center">({{cedulaContribuyente}})</h3>
+    </div>
+    <hr/>
+  </div>
+  <div class="row justify-content-center container-buttons not-print">
+    <div class="col-md-3">
+      <button type="button" class="btn btn-info primaryButton custom-clear-button" style="margin-bottom:35px" (click)="limpiar($event)">
+          <i class="fa fa-eraser" aria-hidden="true"></i>
+          Limpiar
+        </button>
+    </div>
+    <div class="col-md-3">
+      <button type="button" class="btn btn-primary primaryButton custom-print-button" style="margin-bottom:35px" (click)="imprimir($event)">
+            <i class="fa fa-print" aria-hidden="true"></i>
+            Imprimir
+        </button>
+    </div>
+    <div class="col-md-3">
+      <button type="button" class="btn btn-warning primaryButton custom-group-button" style="margin-bottom:35px" (click)="cambiarVista($event)">
+          <i class="fa fa-object-group" aria-hidden="true"></i>
+          {{accionBoton}}
+        </button>
+    </div>
+  </div>
+  <table class="table table-striped no-more-tables ng-scope" style="width: 100%; height: 100%" *ngIf="!infoDesplegada">
+    <thead class="cf">
+      <tr>
+        <th><a (click)="cambiarVista($event)" style="cursor:pointer; color:blue;text-decoration: underline;">Recibo</a></th>
+        <th>Cajero</th>
+        <th>Fecha</th>
+        <th>Código Estándar</th>
+        <th>Periodo</th>
+        <th>Concepto</th>
+        <th>Monto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let linea of datos | orderBy: 'num_recibo'; let i = index">
+        <td data-title="Recibo">{{linea.num_recibo}}</td>
+        <td data-title="Cajero">{{linea.codigo_usuario}}</td>
+        <td data-title="Fecha">{{convertDate(linea.fecha)}}</td>
+        <td data-title="Código Estándar">{{linea.cod_estandar}}</td>
+        <td data-title="Periodo">{{linea.num_periodo}}°-{{linea.anno_cobro}}</td>
+        <td data-title="Concepto">{{linea.concepto}}</td>
+        <td data-title="Monto">‎₡{{linea.monto | number:'1.2-2'}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table table-striped no-more-tables ng-scope" *ngIf="infoDesplegada">
+    <thead class="cf">
+      <tr>
+        <th><a (click)="cambiarVista($event)" style="cursor:pointer; color:blue;text-decoration: underline;">Recibo</a></th>
+        <th>Cajero</th>
+        <th>Fecha</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let linea of datosAgrupados | orderBy: 'num_recibo'; let i = index">
+        <td data-title="Recibo">{{linea.num_recibo}}</td>
+        <td data-title="Cajero">{{linea.codigo_usuario}}</td>
+        <td data-title="Fecha">{{convertDate(linea.fecha)}}</td>
+        <td data-title="Total">‎₡{{calculaTotal(linea.num_recibo) | number:'1.2-2'}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="custom-advice">
+  <div class="alert alert-danger alert-dismissable col-md-12" *ngIf="error === 1">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+    <strong>Error:</strong> Por favor revise la información, no se han encontrado pagos realizados con el dato indicado
+  </div>
+  <div class="alert alert-danger alert-dismissable" *ngIf="error === 3">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+    <strong>Error:</strong> Hubo un error al momento de establecer una conexión con el servidor. Comuníquese con el departamento de servicios informáticos al teléfono <strong>2771-0390 (Ext. 209)</strong>
+  </div>
+</div>
+<div class="row">
+  <button type="submit" class="btn btn-primary primaryButton custom-retry-button" *ngIf="error > 0 && error !== 3" (click)="limpiar()">
+    <i class="fa fa-refresh"></i>
+    Reintentar
+  </button>
+</div>
+<div class="row" *ngIf="error === 3" >
+  <button type="submit" class="btn btn-primary primaryButton custom-retry-button" *ngIf="error > 0" (click)="refrescar()">
+    <i class="fa fa-refresh"></i>
+    Reintentar
+  </button>
+</div>

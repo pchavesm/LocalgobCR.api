@@ -1,0 +1,119 @@
+<div class="container not-print">
+  <form (ngSubmit)="consultarBoletas($event)" #forma="ngForm">
+    <div class="row custom-container-form">
+      <div class="col-md-6 col-sm-12 col-xs-12 custom-ticket" [ngClass]="{'style1' : consulta.boleta.length > 0 , 'style2' : consulta.placa.length > 0 }">
+        <label class="custom-label-title custom-label-helper">Boleta</label>
+        <input  autocomplete="off" required [(ngModel)]="consulta.boleta" (focus)="onFocusBoleta($event)"
+          name="boleta" pattern="^[0-9]+$" type="text" minlength="5" #boleta="ngModel" class="form-control" placeholder="Digite el número de boleta"
+          [disabled]="infoCargada > 0" (click)="onFocusBoleta($event)"
+        />
+        <label class="custom-helper-label">Para realizar búsquedas por <strong>boleta</strong>, digite los valores sin espacios ni guiones.</label>
+        <label class="custom-helper-label" style="color:red" *ngIf="boleta.errors?.minlength || boleta.errors?.pattern">La boleta no cumple con los requisitos mínimos para consultar.</label>
+      </div>
+      <br>
+      <div class="col-md-6 col-sm-12 col-xs-12" [ngClass]="{'style1' : consulta.placa.length > 0 , 'style2' : consulta.boleta.length > 0 }" >
+        <label class="custom-label-title custom-label-helper">Placa</label> 
+        <input autocomplete="off" required [(ngModel)]="consulta.placa" (focus)="onFocusPlaca($event)"
+          name="placa" type="text" minlength="3" #placa="ngModel" class="form-control" placeholder="Digite el número de placa"
+          [disabled]="infoCargada > 0" (click)="onFocusPlaca($event)"
+        />   
+        <label class="custom-helper-label" style="color:red" *ngIf="placa.errors?.minlength">La placa no cumple con los requisitos mínimos para consultar.</label>
+        <label class="custom-helper-label">Para realizar búsquedas por <strong>placa</strong>, digite los valores sin espacios ni guiones.</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="reCaptchaContainer" *ngIf="infoCargada === 0">
+        <div class="col-md-3 center">
+          <re-captcha site_key="6LezCCYTAAAAAOWGz4vIUAdxDtmkCaMQkFTP1eyY" class="reCaptcha" (captchaResponse)="handleCorrectCaptcha($event)"></re-captcha>
+        </div>
+        <div class="col-md-4 center">
+          <button type="submit" class="btn btn-primary primaryButton custom-button" 
+            [disabled]="!captchaResponse || (placa.errors?.required && boleta.errors?.required) || (placa.errors?.minlength || boleta.errors?.minlength) || boleta.errors?.pattern">
+            <i class="fa fa-search"></i>
+                Consultar
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="sk-circle not-print" *ngIf="infoCargada === 1 && error === 0">
+    <div class="sk-circle1 sk-child"></div>
+    <div class="sk-circle2 sk-child"></div>
+    <div class="sk-circle3 sk-child"></div>
+    <div class="sk-circle4 sk-child"></div>
+    <div class="sk-circle5 sk-child"></div>
+    <div class="sk-circle6 sk-child"></div>
+    <div class="sk-circle7 sk-child"></div>
+    <div class="sk-circle8 sk-child"></div>
+    <div class="sk-circle9 sk-child"></div>
+    <div class="sk-circle10 sk-child"></div>
+    <div class="sk-circle11 sk-child"></div>
+    <div class="sk-circle12 sk-child"></div>
+</div>
+<div class="container table-container col-md-12" *ngIf="infoCargada === 2 && error === 0">
+    <hr/>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+          <h1 style="text-align: center" class="print-area">Municipalidad de Pérez Zeledón</h1>
+          <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+        </div>
+        <h1 style="text-align: center" class="print-area">Reporte de multas de parquímetros</h1>
+        <h2 style="text-align:center" *ngIf="consulta.placa !== ''">Placa N°: {{consulta.placa}}</h2>
+        <h2 style="text-align:center" *ngIf="consulta.boleta !== ''">Boleta N°: {{consulta.boleta}}</h2>
+      </div>
+      <hr/>
+    </div>
+    <div class="row justify-content-center container-buttons not-print">
+      <div class="col-md-3">
+        <button type="button" class="btn btn-info primaryButton custom-clear-button" style="margin-bottom:35px" (click)="limpiar($event)">
+          <i class="fa fa-eraser" aria-hidden="true"></i>
+            Limpiar
+        </button>
+      </div>
+      <div class="col-md-3">
+        <button type="button" class="btn btn-primary primaryButton custom-print-button" style="margin-bottom:35px" (click)="imprimir($event)">
+          <i class="fa fa-print" aria-hidden="true"></i>
+          Imprimir
+        </button>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <table class="table table-striped no-more-tables ng-scope custom-table" *ngIf="!infoDesplegada">
+        <thead class="cf">
+          <tr>
+            <th>Placa</th>
+            <th>Tipo de placa</th>
+            <th>Boleta</th>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let linea of datos | orderBy: 'anno'; let i = index">
+            <td data-title="Placa">{{linea.num_placa}}</td>
+            <td data-title="Tipo de placa">{{linea.tip_placa}}</td>
+            <td data-title="Boleta">{{linea.num_boleta}}</td>
+            <td data-title="Fecha">{{convertDate(linea.fecha)}}</td>
+            <td data-title="Monto">₡{{convertirMoneda(linea.monto)| number:'1.2-2'}}</td>
+            <td data-title="Estado">‎{{linea.ind_estado}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="custom-advice">
+    <div class="alert alert-danger alert-dismissable" *ngIf="error === 1">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> Por favor revise la información, no se han encontrado datos vinculados a la información suministrada.
+    </div>
+  </div>
+  <div class="row">
+    <button type="submit" class="btn btn-primary primaryButton custom-retry-button" *ngIf="error > 0" (click)="limpiar()">
+      <i class="fa fa-refresh"></i>
+      Reintentar
+    </button>
+  </div>

@@ -1,0 +1,180 @@
+<div class="container not-print" *ngIf="infoCargada !== -1 && error != 3" >
+  <form (ngSubmit)="consultarPendientes($event)" #forma="ngForm">
+    <label class="custom-label-title custom-label-helper">Cédula</label>
+    <input autocomplete="off" required [disabled]="infoCargada === 2 && error === 0 || infoCargada === 1 && error === 1 || error > 0" [(ngModel)]="consulta.cedula"
+      name="cedula" pattern="^[0-9]+$" type="text" minlength="5" #cedula="ngModel" class="form-control" placeholder="Digite el número de cédula"
+    />
+    <label class="custom-helper-label" style="color:red" *ngIf="cedula.errors?.minlength">El número de cédula indicado, no cumple con los requisitos mínimos.</label>
+    <label class="custom-helper-label">Digite la cédula sin guiones ni espacios, pero con todos los ceros, ejemplo: 017770777, 3101010111</label>
+    <div class="row">
+      <div class="reCaptchaContainer" *ngIf="infoCargada === 0">
+        <div class="col-md-3 center">
+          <re-captcha site_key="6LezCCYTAAAAAOWGz4vIUAdxDtmkCaMQkFTP1eyY" class="reCaptcha" (captchaResponse)="handleCorrectCaptcha($event)"></re-captcha>
+        </div>
+        <div class="col-md-4 center">
+          <button type="submit" class="btn btn-primary primaryButton custom-button" [disabled]="cedula.errors?.required || cedula.errors?.minlength || cedula.errors?.pattern || !captchaResponse">
+                <i class="fa fa-search"></i>
+                Consultar
+            </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="sk-circle not-print" *ngIf="infoCargada === 1 && error === 0 || infoCargada === -1">
+  <div class="sk-circle1 sk-child"></div>
+  <div class="sk-circle2 sk-child"></div>
+  <div class="sk-circle3 sk-child"></div>
+  <div class="sk-circle4 sk-child"></div>
+  <div class="sk-circle5 sk-child"></div>
+  <div class="sk-circle6 sk-child"></div>
+  <div class="sk-circle7 sk-child"></div>
+  <div class="sk-circle8 sk-child"></div>
+  <div class="sk-circle9 sk-child"></div>
+  <div class="sk-circle10 sk-child"></div>
+  <div class="sk-circle11 sk-child"></div>
+  <div class="sk-circle12 sk-child"></div>
+</div>
+<div class="container table-container col-md-12" *ngIf="infoCargada === 2 && error === 0">
+  <hr/>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+        <h1 style="text-align: center" class="print-area">Municipalidad de Pérez Zeledón</h1>
+        <img class="print-area" src="https://perezzeledon.go.cr/media/Escudo-mpz.png" width="40px" height="50px" />
+      </div>
+      <h1 style="text-align: center" class="print-area">Reporte de pendientes</h1>
+      <h2 style="text-align:center">{{nombreContribuyente}}</h2>
+    </div>
+    <div class="col-md-12">
+      <h3 style="text-align:center">({{cedulaContribuyente}})</h3>
+    </div>
+    <hr/>
+  </div>
+  <div class="row justify-content-center container-buttons not-print">
+    <div class="col-md-3">
+      <button type="button" class="btn btn-info primaryButton custom-clear-button" style="margin-bottom:35px" (click)="limpiar($event)">
+        <i class="fa fa-eraser" aria-hidden="true"></i>
+          Limpiar
+      </button>
+    </div>
+    <div class="col-md-3">
+      <button type="button" class="btn btn-primary primaryButton custom-print-button" style="margin-bottom:35px" (click)="imprimir($event)">
+        <i class="fa fa-print" aria-hidden="true"></i>
+        Imprimir
+      </button>
+    </div>
+  </div>
+  <table class="table table-striped no-more-tables ng-scope" *ngIf="!infoDesplegada">
+    <thead class="cf">
+      <tr>
+        <th>Concepto</th>
+        <th>Periodo</th>
+        <th>Año</th>
+        <th>Código estándar</th>
+        <th>Estado</th>
+        <th>Monto</th>
+        <th>Intereses</th>
+        <th>Fec. vencimiento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let linea of datos | orderBy: 'anno'; let i = index">
+        <td data-title="Concepto">{{linea.codigo}}</td>
+        <td data-title="Periodo">{{linea.periodo}}</td>
+        <td data-title="Año">{{linea.anno}}</td>
+        <td data-title="Código estándar">{{linea.codigo_estandar}}</td>
+        <td data-title="Estado">{{linea.estado}}</td>
+        <td data-title="Monto">‎₡{{linea.monto | number:'1.2-2'}}</td>
+        <td data-title="Intereses">‎₡{{linea.intereses | number:'1.2-2'}}</td>
+        <td data-title="Fec. vencimiento">‎{{convertDate(linea.fecha_vencimiento)}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
+  <div class="row not-print justify-content-center">
+    <div class="col-sm-12 col-md-4 col-lg-3" *ngIf="!infoDesplegada">
+      <h3>Al cobro</h3>
+      <table class="no-more-tables table table-striped table-responsive">
+        <tbody>
+          <tr>
+            <th class="col-xs-6">Subtotal</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteAlCobro.subtotal | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Interés</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteAlCobro.intereses | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Multa</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteAlCobro.multas | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Descuento</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteAlCobro.descuento | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Total</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteAlCobro.total | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-3" *ngIf="!infoDesplegada">
+      <h3>Total</h3>
+      <table class="no-more-tables table table-striped table-responsive">
+        <tbody>
+          <tr>
+            <th class="col-xs-6">Subtotal</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteTotal.subtotal | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Interés</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteTotal.intereses | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Multa</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteTotal.multas | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Descuento</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteTotal.descuento | number:'1.2-2'}}</td>
+          </tr>
+          <tr>
+            <th class="col-xs-6">Total</th>
+            <td style="text-align: right" class="col-xs-6">₡{{pendienteTotal.total | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="custom-advice">
+  <div class="alert alert-danger alert-dismissable" *ngIf="error === 2">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+    <strong>Error:</strong> Por favor revise la información, no se encuentra registrado ningún contribuyente con el número
+    de cédula indicado.
+  </div>
+  <div class="alert alert-danger alert-dismissable" *ngIf="error === 3">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+    <strong>Error:</strong> Hubo un error al momento de establecer una conexión con el servidor. Comuníquese con el departamento de servicios informáticos al teléfono <strong>2771-0390 (Ext. 209)</strong>
+  </div>
+  <div class="alert alert-success" *ngIf="error === 1">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+    <strong>Información:</strong> Señor(a) {{nombreContribuyente}}, no se han encontrado tributos pendientes de pago. Gracias
+    por mantenerse al día con sus obligaciones municipales.
+  </div>
+</div>
+<div class="row">
+  <button type="submit" class="btn btn-primary primaryButton custom-retry-button" *ngIf="error > 0 && error !== 3" (click)="limpiar()">
+    <i class="fa fa-refresh"></i>
+    Reintentar
+  </button>
+</div>
+<div class="row" *ngIf="error === 3" >
+  <button type="submit" class="btn btn-primary primaryButton custom-retry-button" *ngIf="error > 0" (click)="refrescar()">
+    <i class="fa fa-refresh"></i>
+    Reintentar
+  </button>
+</div>

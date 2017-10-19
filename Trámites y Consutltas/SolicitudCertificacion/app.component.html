@@ -1,0 +1,71 @@
+<form (ngSubmit)="tramitarCertificacion($event)" #forma="ngForm" style="width: 100%">
+  <div class="custom-main-container">
+    <div class="col-md-12">
+      <input required name="numCedula" [(ngModel)]="infoFormulario.cedula"
+        type="text" class="form-control" placeholder="Digite su número de cédula" required
+        pattern="^[0-9]+$" minlength="5" #cedula="ngModel">
+      <label class="custom-label" style="color:red" *ngIf="cedula.errors?.minlength">El número de cédula indicado, no cumple con los requisitos mínimos.</label>
+      <br *ngIf="cedula.errors?.minlength"/>
+      <label class="custom-label">Digite la cédula sin guiones ni espacios, pero con todos los ceros, ejemplo: 017770777, 3101010111.</label>
+    </div>
+    <div class="col-md-12 custom-contact">
+      <input name="correo" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+        type="email" [(ngModel)] = "infoFormulario.correo" class="form-control custom-inputs" placeholder="Correo electrónico"
+        #correo="ngModel" />
+      <label class="custom-label" style="color:red" *ngIf="correo.errors?.pattern">El correo indicado es inválido.</label>
+    </div>
+    <div class="col-md-12 custom-contact">
+      <input name="telefono" pattern="^[0-9]+$"
+        type="text" [(ngModel)] = "infoFormulario.telefono" class="form-control custom-inputs" placeholder="Número de teléfono"
+        #telefono="ngModel" />
+      <label class="custom-label" style="color:red" *ngIf="telefono.errors?.pattern">El número de teléfono indicado es incorrecto.</label>
+    </div>
+    <div class="col-md-12">
+      <select class="form-control custom-inputs" [(ngModel)]="tipoSolicitud" name="tipoSolicitud">
+        <option value="Default" selected disabled>Elija el tipo de documento a solicitar</option>
+        <option value="Constancia">Constancia</option>
+        <option value="Certificación">Certificación</option>
+      </select>
+    </div>
+    <div class="col-sm-4 custom-container-recaptcha" *ngIf="!recaptchaResponse">
+      <re-captcha #captcha id="captcha" site_key="6LezCCYTAAAAAOWGz4vIUAdxDtmkCaMQkFTP1eyY" class="reCaptcha" (captchaResponse)="handleCorrectCaptcha()"></re-captcha>
+    </div>
+    <div class="col-md-12">
+      <button [disabled]="infoFormulario.cedula == null || (infoFormulario.telefono == '' &&
+        infoFormulario.correo == '') || cedula.errors?.pattern || cedula.errors?.required ||
+        cedula.errors?.minlength || correo.errors?.pattern || telefono.errors?.pattern || !recaptchaResponse || tipoSolicitud === 'Default'"
+        type="submit" class="btn btn-primary custom-button-submit" *ngIf="infoCargada === 0">
+        Solicitar
+      </button>
+      <div class="sk-circle" *ngIf="infoCargada === 1">
+        <div class="sk-circle1 sk-child"></div>
+        <div class="sk-circle2 sk-child"></div>
+        <div class="sk-circle3 sk-child"></div>
+        <div class="sk-circle4 sk-child"></div>
+        <div class="sk-circle5 sk-child"></div>
+        <div class="sk-circle6 sk-child"></div>
+        <div class="sk-circle7 sk-child"></div>
+        <div class="sk-circle8 sk-child"></div>
+        <div class="sk-circle9 sk-child"></div>
+        <div class="sk-circle10 sk-child"></div>
+        <div class="sk-circle11 sk-child"></div>
+        <div class="sk-circle12 sk-child"></div>
+      </div>
+    </div>
+    <div class="alert alert-warning alert-dismissable custom-alert" *ngIf="error === 2">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Mensaje:</strong> Para poder llevar a cabo la solicitud, debe estar al día con sus pagos. Para consultarlos puede hacerlo <a href="https://www.perezzeledon.go.cr/index.php/servicios/consultas-municipales/consulta-de-pendientes.html" target="_blank">aquí</a>
+    </div>
+    <div class="alert alert-danger alert-dismissable custom-alert" *ngIf="error === 1">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> La cédula indicada no se encuentra en los registros de la municipalidad.
+    </div>
+    <div class="alert alert-success alert-dismissable custom-alert" *ngIf="error === 0 && infoCargada === 2">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Correcto:</strong> La solicitud fue concluida de manera satisfactoria.
+    </div>
+    <div class="col-sm-4" *ngIf="infoCargada === 2" (click)="limpiar()">
+      <button class="btn btn-primary custom-button-refresh"><font color="white">Realizar otra solicitud</font></button>
+    </div>
+  </div>
+</form>

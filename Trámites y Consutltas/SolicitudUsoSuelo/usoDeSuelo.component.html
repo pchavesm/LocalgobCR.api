@@ -1,0 +1,146 @@
+<style>
+  :host >>> .completer-dropdown {
+    overflow-y: auto;
+    max-height: 300px;
+    width: 400px;
+    overflow-x: hidden;
+  }
+  :host >>> .completer-input {
+    width: 100%;
+    height: 32px;
+    border-radius: 5px;
+  }
+</style>
+<div class="col-md-12" *ngIf="!desplegarFormulario">
+  <div class="sk-circle">
+    <div class="sk-circle1 sk-child"></div>
+    <div class="sk-circle2 sk-child"></div>
+    <div class="sk-circle3 sk-child"></div>
+    <div class="sk-circle4 sk-child"></div>
+    <div class="sk-circle5 sk-child"></div>
+    <div class="sk-circle6 sk-child"></div>
+    <div class="sk-circle7 sk-child"></div>
+    <div class="sk-circle8 sk-child"></div>
+    <div class="sk-circle9 sk-child"></div>
+    <div class="sk-circle10 sk-child"></div>
+    <div class="sk-circle11 sk-child"></div>
+    <div class="sk-circle12 sk-child"></div>
+  </div>
+</div>
+<div class="row" *ngIf="desplegarFormulario">
+  <div class="col-sm-6 custom-container-input">
+    <div class="col-md-12">
+      <form (ngSubmit)="tienePendientes($event)" #forma="ngForm" style="width: 100%">
+          <input required name="numCedula" [(ngModel)]="infoFormulario.cedula"
+                  [disabled]="archivoCargado || cargandoArchivo || (!pendientes && error === 0)
+                  || error === 1 || error === 2 || error ===3 || error === 4" type="text"
+                  class="form-control" placeholder="Digite el número de cédula" 
+                  pattern="^[0-9]+$" minlength="5" #cedula="ngModel">
+          <label class="custom-label" style="color:red" *ngIf="cedula.errors?.minlength">El número de cédula indicado, no cumple con los requisitos mínimos.</label>
+          <br *ngIf="cedula.errors?.minlength"/>
+          <label class="custom-label">Digite la cédula sin guiones ni espacios, pero con todos los ceros, ejemplo: 017770777, 3101010111.</label>
+          <div class="row custom-category-selector">
+            <div class="col-md-10 col-xs-10 custom-selector-container">
+              <ng2-completer name="searchStr" [disabled]="archivoCargado ||
+                             cargandoArchivo || (!pendientes && error === 0) || error === 1 ||
+                             error === 2 || error ===3 || error === 4"
+                             [(ngModel)]="infoFormulario.tipoPatente"
+                             [datasource]="dataService"
+                             placeholder="Seleccione el tipo de uso de suelo"
+                             [minSearchLength]="0" (selected)="tipoPatenteHandler($event)">
+              </ng2-completer>
+            </div>
+            <div class="col-md-2 col-xs-2 custom-erase-button">
+              <button [disabled]="!tipoPatenteSeleccionada || archivoCargado || cargandoArchivo || (!pendientes && error === 0) || error === 1 || error === 2 || error ===3 || error === 4" type="button" class="btn btn-default" style="font-size:14px" (click)="limpiarTipoPatente($event)">
+                <i class="fa fa-eraser" aria-hidden="true"></i>
+              </button>
+            </div>
+          <div class="col-md-12 custom-contact">
+            <input name="correo" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                   [disabled]="archivoCargado || cargandoArchivo || (!pendientes && error === 0) ||
+                   error === 1 || error === 2 || error ===3 || error === 4" type="email"
+                   [(ngModel)] = "infoFormulario.correo" class="form-control"
+                   placeholder="Correo electrónico" #correo="ngModel" />
+            <label class="custom-label" style="color:red" *ngIf="correo.errors?.pattern">El correo indicado es inválido.</label>
+          </div>
+          <div class="col-md-12 custom-contact">
+            <input name="telefono" pattern="^[0-9]+$"
+                   [disabled]="archivoCargado || cargandoArchivo || (!pendientes && error === 0)
+                   || error === 1 || error === 2 || error ===3 || error === 4" type="text"
+                   [(ngModel)] = "infoFormulario.telefono" class="form-control"
+                   placeholder="Número de teléfono" #telefono="ngModel" />
+            <label class="custom-label" style="color:red" *ngIf="telefono.errors?.pattern">El número de teléfono indicado es incorrecto.</label>
+          </div>
+          <div class="col-sm-4 custom-container-recaptcha" *ngIf="infoCargada === 0">
+            <re-captcha #captcha id="captcha" site_key="6LezCCYTAAAAAOWGz4vIUAdxDtmkCaMQkFTP1eyY" class="reCaptcha" (captchaResponse)="handleCorrectCaptcha($event)"></re-captcha>
+          </div>
+          <div class="col-md-12" *ngIf="pendientes && error === 0">
+            <button [disabled]="!recaptchaResponse || infoFormulario.tipoPatente == '' || infoFormulario.cedula == null || (infoFormulario.telefono == '' && infoFormulario.correo == '') || cedula.errors?.pattern || cedula.errors?.required || cedula.errors?.minlength || correo.errors?.pattern || telefono.errors?.pattern"  type="submit" class="btn btn-primary custom-next-button" style="border-radius:5px">
+              Consultar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-12" *ngIf="infoCargada === 1">
+    <div class="sk-circle">
+      <div class="sk-circle1 sk-child"></div>
+      <div class="sk-circle2 sk-child"></div>
+      <div class="sk-circle3 sk-child"></div>
+      <div class="sk-circle4 sk-child"></div>
+      <div class="sk-circle5 sk-child"></div>
+      <div class="sk-circle6 sk-child"></div>
+      <div class="sk-circle7 sk-child"></div>
+      <div class="sk-circle8 sk-child"></div>
+      <div class="sk-circle9 sk-child"></div>
+      <div class="sk-circle10 sk-child"></div>
+      <div class="sk-circle11 sk-child"></div>
+      <div class="sk-circle12 sk-child"></div>
+    </div>
+  </div>
+    <div class="alert alert-warning alert-dismissable custom-alert" *ngIf="error === 3 && infoCargada === 2">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Mensaje:</strong> Para poder llevar a cabo la solicitud, debe estar al día con sus pagos. Para consultarlos puede hacerlo <a href="https://www.perezzeledon.go.cr/index.php/servicios/consultas-municipales/consulta-de-pendientes.html" target="_blank">aquí</a>
+    </div>
+    <div class="alert alert-danger alert-dismissable custom-alert" *ngIf="error === 1">
+       <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> El archivo debe estar en formato JPG, PNG o PDF
+    </div>
+    <div class="alert alert-danger alert-dismissable custom-alert" *ngIf="error === 2">
+       <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> El archivo debe pesar 3MB o menos
+    </div>
+    <div class="alert alert-danger alert-dismissable custom-alert" *ngIf="error === 4">
+       <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> El número de cédula indicado no se encuentra en nuestros registros
+    </div>
+    <div class="alert alert-danger alert-dismissable custom-alert" *ngIf="error === 5">
+       <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Error:</strong> Debe seleccionar un tipo de uso de suelo
+    </div>
+    <div class="alert alert-success alert-dismissable custom-alert" *ngIf="archivoCargado">
+       <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="limpiar()">&times;</a>
+      <strong>Correcto:</strong> El archivo fue enviado con éxito
+    </div>
+  <hr/>
+  <div class="col-sm-12" *ngIf="!pendientes && (error === 0 || error === 5 || error === 6) && !archivoCargado">
+    <h3 style="text-align:center">Señor(a): <br/> {{nomContribuyente}}</h3>
+  </div>
+  <div class="col-sm-4 custom-container-upload-button"*ngIf="!pendientes && (error === 0 || error === 5 || error === 6)">
+    <label class="custom-file-upload" *ngIf="recaptchaResponse && !archivoCargado && !cargandoArchivo"  style="margin-top:27px">
+      <input type="file" (change)="handleFileSelected($event)" accept=".pdf,.png,.jpg" data-max-size="2048">
+      <font color="white">Selecciona el archivo</font>
+    </label>
+    <label *ngIf="error === 0 && cargandoArchivo" class="custom-container-upload-filename">{{this.nombreArchivo}}</label>
+    <div class="progress custom-progress-bar" *ngIf="cargandoArchivo">
+      <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" [attr.aria-valuenow]="progress" aria-valuemin="0" aria-valuemax ="100" style="min-width: 2em; height:100%" [style.width]="progresoCarga + '%'">
+          {{progresoCarga}}%
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-sm-4 custom-container-upload-button" *ngIf="archivoCargado" (click)="limpiar()">
+  <button class="custom-file-upload"><font color="white">Realizar otra solicitud</font></button>
+</div>

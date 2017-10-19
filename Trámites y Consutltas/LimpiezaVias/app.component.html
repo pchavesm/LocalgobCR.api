@@ -1,0 +1,33 @@
+<div class="sk-circle" *ngIf="infoCargada === 1">
+  <div class="sk-circle1 sk-child"></div>
+  <div class="sk-circle2 sk-child"></div>
+  <div class="sk-circle3 sk-child"></div>
+  <div class="sk-circle4 sk-child"></div>
+  <div class="sk-circle5 sk-child"></div>
+  <div class="sk-circle6 sk-child"></div>
+  <div class="sk-circle7 sk-child"></div>
+  <div class="sk-circle8 sk-child"></div>
+  <div class="sk-circle9 sk-child"></div>
+  <div class="sk-circle10 sk-child"></div>
+  <div class="sk-circle11 sk-child"></div>
+  <div class="sk-circle12 sk-child"></div>
+</div>
+<div class="container tableContainer" *ngIf="infoCargada === 2">
+  <table class="table table-striped table-responsive no-more-tables customTable">
+      <thead class="cf">
+          <tr>
+              <th>Construcción</th>
+              <th>Zona</th>
+              <th>Monto</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let linea of datos; let i = index">
+              <td data-title="Construcción">{{linea.construccion}}</td>
+              <td data-title="Zona">{{linea.zonas}}</td>
+              <td data-title="Monto">‎₡{{linea.pendiente | number:'4.2-3'}}</td>
+          </tr>
+      </tbody>
+  </table>
+  <label class="labelClass">*Montos trimestrales</label>
+</div>
