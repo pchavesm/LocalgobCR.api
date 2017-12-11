@@ -7,6 +7,7 @@ namespace MPZ_API.Clases
 {
     public class Pendiente
     {
+        public string num_cobro;
         public string anno;
         public string cedula;
         public string codigo;
@@ -19,14 +20,18 @@ namespace MPZ_API.Clases
         public double monto;
         public string periodo;
         public double multa;
+        public double timbres;
+        public string cod_conceptoCobro;
         public bool tienePendientes;
+
 
         public Pendiente()
         {
         }
 
-        public Pendiente(string pCodigo, string pPeriodo, string pAnno, string pEstado, double pMonto, string pCodigo_Estandar, string pVencimiento, string pCedula, string pContribuyente, string pDescuento, double pMulta)
+        public Pendiente(string num_cobro, string pCodigo, string pPeriodo, string pAnno, string pEstado, double pMonto, string pCodigo_Estandar, string pVencimiento, string pCedula, string pContribuyente, string pDescuento, double pMulta)
         {
+            this.num_cobro = num_cobro;
             this.codigo = pCodigo;
             this.periodo = pPeriodo;
             this.anno = pAnno;
@@ -40,8 +45,9 @@ namespace MPZ_API.Clases
             this.multa = pMulta;
         }
 
-        public Pendiente(string pCodigo, string pPeriodo, string pAnno, string pEstado, double pMonto, string pCodigo_Estandar, string pVencimiento, double pIntereses, string pCedula, string pContribuyente, string pDescuento, double pMulta)
+        public Pendiente(string num_cobro, string pCodigo, string pPeriodo, string pAnno, string pEstado, double pMonto, string pCodigo_Estandar, string pVencimiento, double pIntereses, string pCedula, string pContribuyente, string pDescuento, double pMulta, string cod_conceptoCobro, double pTimbres)
         {
+            this.num_cobro = num_cobro;
             this.codigo = pCodigo;
             this.periodo = pPeriodo;
             this.anno = pAnno;
@@ -54,6 +60,8 @@ namespace MPZ_API.Clases
             this.contribuyente = pContribuyente;
             this.descuento = pDescuento;
             this.multa = pMulta;
+            this.cod_conceptoCobro = cod_conceptoCobro;
+            this.timbres = pTimbres;
         }
 
         public Pendiente(bool pTienePendiente)
